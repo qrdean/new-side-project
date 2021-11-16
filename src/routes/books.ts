@@ -1,6 +1,8 @@
 import { randomUUID } from 'crypto'
 import express from 'express'
 
+import { auth } from '../auth/auth'
+
 export const bookRouter = express.Router()
 
 // book information
@@ -23,14 +25,14 @@ bookRouter.get('/find', (req, res) => {
 // Need to think about these two things ito how these queries will work.
 // Do we want to pull just the entire book list and then just the inventory
 // or combine those queries in to one big pull of info? Or Something else?
-bookRouter.get('/masterBookList', (req, res) => {
+bookRouter.get('/masterBookList', auth.optional, (req, res) => {
     if (masterBooks.length === 0) {
         return res.send({ message: 'No master books' })
     }
     res.send({ masterBooksList: masterBooks })
 })
 
-bookRouter.get('/allInventory', (req, res) => {
+bookRouter.get('/allInventory', auth.required, (req, res) => {
     if (bookInventory.length === 0) {
         return res.send({ message: 'No books' })
     }
@@ -59,7 +61,7 @@ bookRouter.get('/available', (req, res) => {
 bookRouter.post('/addMaster', (req, res) => {
     // add to db
     masterBooks.push({
-        id: randomUUID(),
+        id: req.body.id,
         lccn: req.body.lccn,
         isbn: req.body.isbn,
         title: req.body.title,
@@ -73,13 +75,13 @@ bookRouter.post('/addMaster', (req, res) => {
  * Takes the id of the master book list
  */
 bookRouter.post('/addInventory', (req, res) => {
-    const book = masterBooks.find(book => book.id === req.body.id)
+    const book = masterBooks.find(book => book.id === req.body.master_id)
     if (book == null) {
         res.send({ message: 'no master book found by that Id' })
     }
     bookInventory.push({
-        id: randomUUID(),
-        master_book_id: req.body.id,
+        id: req.body.id,
+        master_book_id: req.body.master_id,
         checked_out_to_user_id: null,
     })
     res.send({ message: 'book added to inventory ' })

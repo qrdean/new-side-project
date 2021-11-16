@@ -5,6 +5,7 @@ import passport from 'passport'
 export const userRouter = express.Router()
 import { generateJWT, toAuthJSON } from '../auth/authHelper';
 import { initialize } from '../config/passport'
+import { auth } from '../auth/auth'
 
 let users: any[] = []
 initialize(
@@ -13,7 +14,7 @@ initialize(
     (id: any) => users.find(user => user.id === id)
 )
 
-userRouter.post('/loginWithPassport', (req, res, next) => {
+userRouter.post('/loginWithPassport', auth.optional, (req, res, next) => {
     return passport.authenticate('local', { session: false },
         (err, passportUser, info) => {
             if (err) {
@@ -30,7 +31,7 @@ userRouter.post('/loginWithPassport', (req, res, next) => {
         })(req, res, next)
 })
 
-userRouter.post('/login', async (req, res) => {
+userRouter.post('/login', auth.optional, async (req, res) => {
     const user = users.find(user => user.name === req.body.name)
     if (user == null) {
         return res.status(401).send({ message: 'Login Failed' })
