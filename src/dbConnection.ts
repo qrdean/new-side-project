@@ -37,3 +37,7 @@ export function disconnect(conn: mysql.Connection): void {
     })
 
 }
+
+export function makeACall(conn: mysql.Connection): void {
+
+}

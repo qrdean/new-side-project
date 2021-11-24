@@ -1,7 +1,8 @@
 import express from 'express';
 import passport from 'passport'
 
-import { createConnection, connect, disconnect } from './dbConnection'
+// import { createConnection, connect, disconnect } from './dbConnection'
+import { checkInBook } from './db/dbPool'
 import { userRouter } from './routes/user';
 import { bookRouter } from './routes/books'
 
@@ -13,21 +14,22 @@ app.use('/user', userRouter)
 app.use('/book', bookRouter)
 app.use(passport.initialize())
 
-app.get('/', (req,res) => res.send('Express + TypeScript Server'));
+app.get('/', (req, res) => res.send('Express + TypeScript Server'));
 
 // FIXME: remove this! not going to be an actual route.
 // Just for testing. Need to add jest
 app.get('/dbconnect', async (req, res) => {
-    // create connection object
-    let conn = createConnection()
-    // connect to db
-    connect(conn)
-    
-    setTimeout(() => {
-        disconnect(conn)
-        res.send({ message: 'Done'})
-    }, 3000);
 
+    const masterBookObj = {
+        lccn: "1234-1234",
+        isbn: "12345",
+        title: 'test_title1',
+        author: 'test_author',
+        publishDate: new Date('10/10/2020')
+    }
+
+    const result = await checkInBook(1)
+    res.send(result)
 })
 
 const PORT = 8000;
