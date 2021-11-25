@@ -2,7 +2,7 @@ import express from 'express';
 import passport from 'passport'
 
 // import { createConnection, connect, disconnect } from './dbConnection'
-import { checkInBook } from './db/dbPool'
+import { getUserByEmail, checkInBook } from './db/dbPool'
 import { userRouter } from './routes/user';
 import { bookRouter } from './routes/books'
 
@@ -28,7 +28,7 @@ app.get('/dbconnect', async (req, res) => {
         publishDate: new Date('10/10/2020')
     }
 
-    const result = await checkInBook(1)
+    const result = await getUserByEmail('test@test.com')
     res.send(result)
 })
 

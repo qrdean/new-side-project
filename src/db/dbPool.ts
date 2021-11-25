@@ -36,7 +36,9 @@ export async function getUserById(id: number): Promise<any> {
 
 export async function insertUser(userObject: any): Promise<void> {
     const query = 'INSERT INTO library_user SET name = ?, email = ?, password = ?'
-    await pool.query(query, [userObject.name, userObject.email, userObject.password])
+    const result = await pool.query(query, [userObject.name, userObject.email, userObject.password])
+    console.log(result)
+    console.log(result[0])
 }
 
 
@@ -77,6 +79,15 @@ export async function getAvailableBooks(): Promise<any> {
         throw new Error('No available Books')
     }
     return result[0]
+}
+
+export async function getAvailableBook(id: any): Promise<any> {
+    const query: string = 'SELECT * FROM book_inventory WHERE id = ?'
+    const result: any = await pool.query(query, [id])
+    if (result[0].length < 1) {
+        throw new Error('Book is not available')
+    }
+    return result[0][0]
 }
 
 export async function checkoutBookToUser(inventoryBookId: any, userId: any): Promise<any> {

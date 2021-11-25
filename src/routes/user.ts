@@ -6,13 +6,10 @@ export const userRouter = express.Router()
 import { generateJWT, toAuthJSON } from '../auth/authHelper';
 import { initialize } from '../config/passport'
 import { auth } from '../auth/auth'
+import { insertUser, getUserByEmail, getUserById } from '../db/dbPool'
 
 let users: any[] = []
-initialize(
-    passport,
-    (email: any) => users.find(user => user.email === email),
-    (id: any) => users.find(user => user.id === id)
-)
+initialize(passport, getUserByEmail, getUserById)
 
 userRouter.post('/loginWithPassport', auth.optional, (req, res, next) => {
     return passport.authenticate('local', { session: false },
@@ -56,8 +53,7 @@ userRouter.post('/register', async (req, res) => {
     try {
         const hashedPassword = await bcrypt.hash(req.body.password, 10)
         // Save to db 
-        users.push({
-            id: req.body.id,
+        await insertUser({
             name: req.body.name,
             email: req.body.email,
             password: hashedPassword
