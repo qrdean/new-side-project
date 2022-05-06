@@ -4,7 +4,7 @@ const pool = mysql.createPool({
     host: '0.0.0.0',
     user: 'root',
     database: 'test_db',
-    port: 1234,
+    port: 2107,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
@@ -20,7 +20,8 @@ export async function getUserByEmail(email: string): Promise<any> {
     const query = 'SELECT * FROM library_user WHERE email = ?'
     const result: any = await pool.query(query, [email])
     if (result[0].length < 1) {
-        throw new Error('Post with this id was not found')
+        return[]
+        //throw new Error('Post with this id was not found')
     }
     return result[0][0]
 }
@@ -29,7 +30,8 @@ export async function getUserById(id: number): Promise<any> {
     const query = 'SELECT * FROM library_user WHERE id = ?'
     const result: any = await pool.query(query, [id])
     if (result[0].length < 1) {
-        throw new Error('Post with this id was not found')
+        return[]
+        // throw new Error('Post with this id was not found')
     }
     return result[0][0]
 }
@@ -49,7 +51,8 @@ export async function getMasterBookList(): Promise<any> {
     const query = 'SELECT * FROM master_book'
     const result: any = await pool.query(query)
     if (result[0].length < 1) {
-        throw new Error('No Master books')
+        return []
+        //throw new Error('No Master books')
     }
     return result[0]
 }
@@ -57,7 +60,7 @@ export async function getMasterBookList(): Promise<any> {
 export async function addMasterBook(masterBook: any): Promise<any> {
     const query = `INSERT INTO master_book SET lccn = ?, isbn = ?, title = ?, 
         author = ?, publishDate = ?`
-    await pool.query(query,
+    return await pool.query(query,
         [masterBook.lccn, masterBook.isbn, masterBook.title, masterBook.author,
         masterBook.publishDate])
 }
@@ -76,7 +79,8 @@ export async function getAvailableBooks(): Promise<any> {
     `
     const result: any = await pool.query(query)
     if (result[0].length < 1) {
-        throw new Error('No available Books')
+        return []
+        //throw new Error('No available Books')
     }
     return result[0]
 }
@@ -85,7 +89,8 @@ export async function getAvailableBook(id: any): Promise<any> {
     const query: string = 'SELECT * FROM book_inventory WHERE id = ?'
     const result: any = await pool.query(query, [id])
     if (result[0].length < 1) {
-        throw new Error('Book is not available')
+        return null
+        //throw new Error('Book is not available')
     }
     return result[0][0]
 }
