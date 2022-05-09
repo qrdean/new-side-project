@@ -80,7 +80,6 @@ export async function getAvailableBooks(): Promise<any> {
     const result: any = await pool.query(query)
     if (result[0].length < 1) {
         return []
-        //throw new Error('No available Books')
     }
     return result[0]
 }
@@ -90,7 +89,6 @@ export async function getAvailableBook(id: any): Promise<any> {
     const result: any = await pool.query(query, [id])
     if (result[0].length < 1) {
         return null
-        //throw new Error('Book is not available')
     }
     return result[0][0]
 }

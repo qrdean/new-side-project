@@ -48,6 +48,9 @@ userRouter.post('/login', auth.optional, async (req, res) => {
 
 /**
  * Register route
+ *   @params - email: string
+ *   @params - name: string
+ *   @params - password: string
  */
 userRouter.post('/register', async (req, res) => {
     try {

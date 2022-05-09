@@ -28,7 +28,7 @@ bookRouter.get('/masterBookList', auth.optional, async (req, res) => {
 /**
  * Finds all books that are currently available
  */
-bookRouter.get('/available', async (req, res) => {
+bookRouter.get('/available', auth.required, async (req, res) => {
     const availableBooks = await getAvailableBooks()
     if (availableBooks.length === 0) {
         return res.send({ books: [], message: 'No books available' })
@@ -44,7 +44,7 @@ bookRouter.get('/available', async (req, res) => {
  * @param author - string
  * @param publishDate - Date
  */
-bookRouter.post('/addMaster', async (req, res) => {
+bookRouter.post('/addMaster', auth.required, async (req, res) => {
     try {
         let dbResponse = await addMasterBook({
             lccn: req.body.lccn,

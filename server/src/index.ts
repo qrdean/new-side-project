@@ -20,6 +20,14 @@ app.use('/user', userRouter)
 app.use('/book', bookRouter)
 app.use(passport.initialize())
 
+// jwt auth error handling
+app.use((err:any, req:any, res:any, next:any) => {
+    if (err.name === "UnauthorizedError") {
+        res.status(401).send({message: "invalid token"})
+    } else {
+        next(err)
+    }
+})
 
 app.get('/', (req, res) => res.send('Express + TypeScript Server'));
 
