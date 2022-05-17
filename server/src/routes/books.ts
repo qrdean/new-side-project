@@ -3,7 +3,8 @@ import express from 'express'
 import { auth } from '../auth/auth'
 import {
     getMasterBookList,
-    addMasterBook,
+    addMasterBook, 
+    addInventoryLocation,
     addToInventoryByMasterId,
     getAvailableBooks,
     getAvailableBook,
@@ -71,6 +72,24 @@ bookRouter.post('/addMaster', auth.required, async (req, res) => {
     }
 })
 
+/**
+ * Takes an object of:
+ * @param locationName - String
+ */
+bookRouter.post('/addInventoryList', auth.required, async (req, res) => {
+    try {
+        let dbResponse = await addInventoryLocation({ locationName: req.body.locationName })
+
+        if (dbResponse.length === 0) {
+            res.status(500).send({ message: "Error Adding Inventory Location" })
+            return
+        }
+
+        res.send({ message: 'Inventory Location Added' })
+    } catch (err) {
+        res.status(500).send({ message: "Error Adding Inventory Location" })
+    }
+})
 /**
  * Takes the id of the master book list
  * master_id: int

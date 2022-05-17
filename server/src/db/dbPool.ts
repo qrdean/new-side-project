@@ -110,3 +110,23 @@ export async function checkInBook(inventoryBookId: any): Promise<any> {
     `
     await pool.query(query, [inventoryBookId])
 }
+
+export async function addInventoryLocation(inventoryLocation: any): Promise<any> {
+    const query = `INSERT INTO inventory_location SET location_name = ?;`
+    return await pool.query(query, [inventoryLocation.locationName])
+}
+
+export async function setInventoryLocationActive(inventoryLocation: any): Promise<any> {
+    const query = `UPDATE inventory_location SET active = ? WHERE = ?;`
+    return await pool.query(query, [inventoryLocation.active, inventoryLocation.id])
+}
+
+export async function getInventoryLocations(): Promise<any> {
+    const query = `SELECT * FROM inventory_location;`
+
+    const result: any = await pool.query(query)
+    if (result[0].length < 1) {
+        return []
+    }
+    return result[0]
+}
