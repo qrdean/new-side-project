@@ -1,5 +1,6 @@
 import * as mysql from 'mysql2/promise'
 
+// need to setup environment variables
 const pool = mysql.createPool({
     host: '0.0.0.0',
     user: 'root',
