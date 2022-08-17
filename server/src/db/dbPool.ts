@@ -21,6 +21,7 @@ export async function getUserByEmail(email: string): Promise<any> {
     const query = 'SELECT * FROM library_user WHERE email = ?'
     const result: any = await pool.query(query, [email])
     if (result[0].length < 1) {
+        console.error("result: ", result)
         return[]
         //throw new Error('Post with this id was not found')
     }
@@ -31,6 +32,7 @@ export async function getUserById(id: number): Promise<any> {
     const query = 'SELECT * FROM library_user WHERE id = ?'
     const result: any = await pool.query(query, [id])
     if (result[0].length < 1) {
+        console.error("result: ", result)
         return[]
         // throw new Error('Post with this id was not found')
     }
@@ -52,6 +54,7 @@ export async function getMasterBookList(): Promise<any> {
     const query = 'SELECT * FROM master_book'
     const result: any = await pool.query(query)
     if (result[0].length < 1) {
+        console.error("result: ", result)
         return []
         //throw new Error('No Master books')
     }
@@ -66,9 +69,40 @@ export async function addMasterBook(masterBook: any): Promise<any> {
         masterBook.publishDate])
 }
 
+export async function getAllBooks(): Promise<any> {
+    const query = `SELECT 
+        book_inventory.id,
+        book_inventory.master_id,
+        book_inventory.location_id,
+        master_book.lccn,
+        master_book.isbn,
+        master_book.title,
+        master_book.author,
+        master_book.publishDate
+        FROM book_inventory INNER JOIN master_book 
+        on book_inventory.master_id = master_book.id;`
+    
+    const result: any = await pool.query(query)
+    if (result[0].length < 1) {
+        console.error("result: ", result)
+        return []
+    }
+    return result[0]
+}
+
 export async function addToInventoryByMasterId(id: any): Promise<any> {
     const query = `INSERT INTO book_inventory SET master_id = ?`
     await pool.query(query, [id])
+}
+
+export async function editBookInventoryLocation(bookId: any, inventoryLocationId: any): Promise<any> {
+    const query = `UPDATE book_inventory SET location_id = ? WHERE id = ?`
+    const result: any = await pool.query(query, [inventoryLocationId, bookId])
+    if (result[0].length < 1) {
+        console.error("result: ", result)
+        return []
+    }
+    return result[0]
 }
 
 export async function getAvailableBooks(): Promise<any> {
@@ -80,6 +114,7 @@ export async function getAvailableBooks(): Promise<any> {
     `
     const result: any = await pool.query(query)
     if (result[0].length < 1) {
+        console.error("result: ", result)
         return []
     }
     return result[0]
@@ -118,7 +153,7 @@ export async function addInventoryLocation(inventoryLocation: any): Promise<any>
 }
 
 export async function setInventoryLocationActive(inventoryLocation: any): Promise<any> {
-    const query = `UPDATE inventory_location SET active = ? WHERE = ?;`
+    const query = `UPDATE inventory_location SET active = ? WHERE id = ?;`
     return await pool.query(query, [inventoryLocation.active, inventoryLocation.id])
 }
 
@@ -127,7 +162,21 @@ export async function getInventoryLocations(): Promise<any> {
 
     const result: any = await pool.query(query)
     if (result[0].length < 1) {
+        console.error("result: ", result)
+        console.error("No Inventory To get")
         return []
     }
     return result[0]
+}
+
+export async function deleteInventoryLocation(inventoryLocation: any): Promise<any> {
+    const query = `DELETE FROM inventory_location WHERE id = ?;`
+    const result: any = await pool.query(query, [inventoryLocation.id])
+    if (result[0].length < 1) {
+        console.error("result: ", result)
+        console.error("id not found")
+        return []
+    }
+    return result[0]
+
 }

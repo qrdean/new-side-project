@@ -3,13 +3,18 @@ import express from 'express'
 import { auth } from '../auth/auth'
 import {
     getMasterBookList,
+    getAllBooks,
     addMasterBook, 
     addInventoryLocation,
     addToInventoryByMasterId,
     getAvailableBooks,
     getAvailableBook,
     checkoutBookToUser,
-    checkInBook
+    checkInBook,
+    setInventoryLocationActive, 
+    deleteInventoryLocation,   
+    getInventoryLocations,
+    editBookInventoryLocation
 } from '../db/dbPool'
 
 export const bookRouter = express.Router()
@@ -29,12 +34,21 @@ bookRouter.get('/masterBookList', auth.optional, async (req, res) => {
 /**
  * Finds all books that are currently available
  */
-bookRouter.get('/available', auth.required, async (req, res) => {
+bookRouter.get('/available', auth.optional, async (req, res) => {
     const availableBooks = await getAvailableBooks()
     if (availableBooks.length === 0) {
         return res.send({ books: [], message: 'No books available' })
     }
     res.send({ books: availableBooks })
+})
+
+bookRouter.get('/all', auth.optional, async (req, res) => {
+    const books = await getAllBooks()
+    if (books.length === 0) {
+        return res.status(400).send({ books: [], message: 'No Books'})
+    }
+
+    res.send({ books: books })
 })
 
 /**
@@ -45,7 +59,7 @@ bookRouter.get('/available', auth.required, async (req, res) => {
  * @param author - string
  * @param publishDate - Date
  */
-bookRouter.post('/addMaster', auth.required, async (req, res) => {
+bookRouter.post('/addMaster', auth.optional, async (req, res) => {
     try {
         let dbResponse = await addMasterBook({
             lccn: req.body.lccn,
@@ -72,11 +86,26 @@ bookRouter.post('/addMaster', auth.required, async (req, res) => {
     }
 })
 
+bookRouter.post('/editBookInventoryLocation', auth.optional, async (req, res) => {
+    try {
+        let dbResponse = await editBookInventoryLocation(req.body.bookId, req.body.inventoryLocationId)
+
+        if (dbResponse.length === 0) {
+            res.status(500).send({ message: "Error Editing Book Location" })
+            return
+        }
+
+        res.send({ message: 'Book Location Edited' })
+    } catch (err) {
+        res.status(500).send({ message: "Error Editing Book Location" })
+    }
+})
+
 /**
  * Takes an object of:
  * @param locationName - String
  */
-bookRouter.post('/addInventoryList', auth.required, async (req, res) => {
+bookRouter.post('/addInventoryLocation', auth.optional, async (req, res) => {
     try {
         let dbResponse = await addInventoryLocation({ locationName: req.body.locationName })
 
@@ -90,21 +119,55 @@ bookRouter.post('/addInventoryList', auth.required, async (req, res) => {
         res.status(500).send({ message: "Error Adding Inventory Location" })
     }
 })
-/**
- * Takes the id of the master book list
- * master_id: int
- * TODO: Remove this.
- */
-bookRouter.post('/addInventory', async (req, res) => {
-    // Need a DB Call to check for the master book
+
+bookRouter.post('/editInventoryLocation', auth.optional, async (req, res) => {
     try {
-        await addToInventoryByMasterId(req.body.master_id)
-        res.send({ message: 'book added to inventory' })
+        let dbResponse = await setInventoryLocationActive({ id: req.body.id, active: req.body.active })
+
+        if (dbResponse.length === 0) {
+            res.status(500).send({ message: "Error Editing Inventory Location" })
+            return
+        }
+
+        res.send({ message: 'Inventory Location Edited' })
     } catch (err) {
-        console.error(err)
-        res.status(500).send({ message: 'Book not added to inventory' })
+        res.status(500).send({ message: "Error Editing Inventory Location" })
     }
 })
+
+bookRouter.get('/getInventoryLocations', auth.optional, async (req, res) => {
+    try {
+        let dbResponse = await getInventoryLocations()
+
+        if (dbResponse.length === 0) {
+            res.status(500).send({ message: "Error Getting Inventory Location" })
+            return
+        }
+
+        res.send({ inventoryLocations: dbResponse, message: "Inventory Location List" })
+    } catch (err) {
+        res.status(500).send({ message: "Error Getting Inventory Location" })
+    }
+})
+
+bookRouter.post('/deleteInventoryLocation', auth.optional, async (req, res) => {
+    try {
+        let dbResponse = await deleteInventoryLocation({ id: req.body.id })
+
+        if (dbResponse.length === 0) {
+            res.status(500).send({ message: "Error Removing Inventory Location"})
+            return
+        }
+
+        res.send({ message: 'Inventory Location Removed'})
+    } catch (err) {
+        console.error(err)
+        res.status(500).send({ message: "Error Removing Inventory Location" })
+    }
+})
+
+
+// TODO: Not implemented on the front end
 
 // Checks the book to see if it is available
 // if available sends the users id back
