@@ -2,7 +2,7 @@ import express from 'express';
 import passport from 'passport'
 
 // import { createConnection, connect, disconnect } from './dbConnection'
-import { getUserByEmail, checkInBook } from './db/dbPool'
+import { getMasterBookList, checkInBook } from './db/dbPool'
 import { userRouter } from './routes/user';
 import { bookRouter } from './routes/books'
 
@@ -43,11 +43,12 @@ app.get('/dbconnect', async (req, res) => {
         publishDate: new Date('10/10/2020')
     }
 
-    const result = await getUserByEmail('test@test.com')
+    const result = await getMasterBookList()
     res.send(result)
 })
 
-const PORT = 8000;
+// FIXME: configure to be an environment variable
+const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
     console.log(`[server]: Server is running at https://localhost:${PORT}`)
 })

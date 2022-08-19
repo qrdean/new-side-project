@@ -4,8 +4,9 @@
   "description": "A new server for this new app we gonna make",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon ./src/index.ts",
-    "build": "tsc --project ./"
+    "dev": "nodemon ./src/index.ts",
+    "build": "tsc --project ./",
+    "start": "node ./dist/src/index.js"
   },
   "keywords": [],
   "author": "Quinton Dean",

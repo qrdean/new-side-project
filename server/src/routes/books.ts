@@ -2,6 +2,7 @@ import express from 'express'
 
 import { auth } from '../auth/auth'
 import {
+    getBookById,
     getMasterBookList,
     getAllBooks,
     addMasterBook, 
@@ -49,6 +50,15 @@ bookRouter.get('/all', auth.optional, async (req, res) => {
     }
 
     res.send({ books: books })
+})
+
+bookRouter.post('/id', auth.optional, async (req, res) => {
+    const book = await getBookById(req.body.id)
+    if (book.length === 0) {
+        return res.status(400).send({ books: [], message: 'No Books'})
+    }
+
+    res.send({ book: book })
 })
 
 /**
@@ -144,6 +154,10 @@ bookRouter.get('/getInventoryLocations', auth.optional, async (req, res) => {
             return
         }
 
+        dbResponse.map((data: any) => {
+            data.active = data.active ? true : false
+        })
+
         res.send({ inventoryLocations: dbResponse, message: "Inventory Location List" })
     } catch (err) {
         res.status(500).send({ message: "Error Getting Inventory Location" })
@@ -163,6 +177,16 @@ bookRouter.post('/deleteInventoryLocation', auth.optional, async (req, res) => {
     } catch (err) {
         console.error(err)
         res.status(500).send({ message: "Error Removing Inventory Location" })
+    }
+})
+
+bookRouter.post('/upload', auth.optional, async(req, res) => {
+    try {
+        console.log(req)
+        res.send({ message: 'yoyo'})
+    } catch (err) {
+        console.error(err)
+        res.status(500).send({ message: 'borken'})
     }
 })
 

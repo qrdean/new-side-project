@@ -1,11 +1,10 @@
 import * as mysql from 'mysql2/promise'
 
-// need to setup environment variables
 const pool = mysql.createPool({
-    host: '0.0.0.0',
-    user: 'root',
-    database: 'test_db',
-    port: 2107,
+    host: process.env.DB_HOST || '0.0.0.0',
+    user: process.env.DB_USER || 'root',
+    database: process.env.DATABASE || 'test_db',
+    port: process.env.DB_PORT ? Number(process.env.DB_PORT) : 2107,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
@@ -74,10 +73,10 @@ export async function getAllBooks(): Promise<any> {
         book_inventory.id,
         book_inventory.master_id,
         book_inventory.location_id,
+        master_book.author,
+        master_book.title,
         master_book.lccn,
         master_book.isbn,
-        master_book.title,
-        master_book.author,
         master_book.publishDate
         FROM book_inventory INNER JOIN master_book 
         on book_inventory.master_id = master_book.id;`
@@ -88,6 +87,20 @@ export async function getAllBooks(): Promise<any> {
         return []
     }
     return result[0]
+}
+
+export async function getBookById(id: any): Promise<any> {
+    const query = `SELECT * FROM master_book as mb 
+        INNER JOIN book_inventory as ib
+        ON ib.master_id = mb.id
+        WHERE ib.id = ?;
+    `
+    const result: any = await pool.query(query, [id])
+    if (result[0].length < 1) {
+        console.error('result: ', result)
+        return []
+    }
+    return result[0][0]
 }
 
 export async function addToInventoryByMasterId(id: any): Promise<any> {
