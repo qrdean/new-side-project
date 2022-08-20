@@ -1,0 +1,5 @@
+node_modules
+volumes
+dist
+sql
+scripts.txt

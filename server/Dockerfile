@@ -13,7 +13,9 @@ COPY . ./
 RUN npm run build
 
 ENV PORT=80
-ENV DB_HOST=librarymysql
+ENV DB_HOST=45.79.42.111
 ENV DB_PORT=3306
+ENV DB_USER=qdean
+ENV DATABASE=librarydb
 
 CMD [ "npm", "start" ]

@@ -1,24 +1,20 @@
 version: '3.7'
 services:
-  db:
-    image: mysql:5.6
-    networks:
-      - library-net
-    container_name: librarymysql 
-    ports:
-      - "2107:3306"
-    environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: 1
-      MYSQL_DATABASE: test_db
-    volumes:
-      - ./volumes/mysql:/var/lib/mysql
+
+# db:
+#   image: mysql:5.6
+#   networks:
+#     - library-net
+#   container_name: librarymysql 
+#   ports:
+#     - "2107:3306"
+#   environment:
+#     MYSQL_ALLOW_EMPTY_PASSWORD: 1
+#     MYSQL_DATABASE: test_db
+#   volumes:
+#     - ./volumes/mysql:/var/lib/mysql
   api:
     image: library-api:latest
-    networks:
-      - library-net
     container_name: libraryapi
     ports:
       - "8080:80"
-networks:
-  library-net:
-    external: true
